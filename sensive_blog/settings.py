@@ -1,14 +1,19 @@
 import os
+
 from environs import Env
 from dotenv import load_dotenv
+
 load_dotenv()
 env = Env()
 env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 ALLOWED_HOSTS = []
+
+INTERNAL_IPS = [
+     '127.0.0.1',
+ ]
 
 SECRET_KEY = os.getenv("SECRET_KEY", "REPLACE_ME")
 
@@ -22,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'debug_toolbar',
     'blog',
 ]
 
@@ -33,14 +39,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'sensive_blog.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
 STATIC_ROOT = ''
 
 TEMPLATES = [
@@ -96,4 +105,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 MEDIA_URL = '/media/'
