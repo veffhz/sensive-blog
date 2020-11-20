@@ -6,11 +6,11 @@ from django.contrib.auth.models import User
 
 class PostQuerySet(models.QuerySet):
 
-    def popular(self):
+    def popular_posts(self):
         popular_posts = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
         return popular_posts
 
-    def fresh(self):
+    def fresh_posts(self):
         fresh_posts = self.annotate(comments_count=Count('comments')).order_by('-published_at')
         return fresh_posts
 
@@ -22,6 +22,10 @@ class PostQuerySet(models.QuerySet):
         for post in self:
             post.comments_count = ids_and_comments[post.id]
         return list(self)
+
+    def tags_count(self):
+        tags = self.annotate(tags_count=Count('tags'))
+        return tags
 
 
 class Post(models.Model):
@@ -51,9 +55,13 @@ class Post(models.Model):
 
 class TagQuerySet(models.QuerySet):
 
-    def popular(self):
+    def popular_tags(self):
         popular_tags = self.annotate(posts_count=Count('posts')).order_by('-posts_count')
         return popular_tags
+
+    def posts_count(self):
+        posts = self.annotate(posts_count=Count('posts'))
+        return posts
 
 
 class Tag(models.Model):
