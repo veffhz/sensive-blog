@@ -13,27 +13,29 @@ def serialize_post(post):
         "published_at": post.published_at,
         "slug": post.slug,
         "tags": [serialize_tag(tag) for tag in post.tags.all()],
-        'first_tag_title': post.tags.all()[0].title,
+        'first_tag_title': post.tags.first().title,
     }
 
 
 def serialize_tag(tag):
     return {
         'title': tag.title,
-        'posts_with_tag': len(Post.objects.filter(tags=tag)),
+        'posts_with_tag': tag.posts_count,
     }
 
 
 def index(request):
+    query = Post.objects
+
     most_popular_posts = (
-        Post.objects.popular_posts()
-            .prefetch_related('author', 'tags')[:5]
-            .fetch_with_comments_count()
+        query.popular_posts().annotate_tags()
+             .prefetch_related('author')[:5]
+             .fetch_with_comments_count()
     )
 
     most_fresh_posts = (
-        Post.objects.fresh_posts()
-            .prefetch_related('author', 'tags')[:5]
+        query.fresh_posts().annotate_tags()
+             .prefetch_related('author')[:5]
     )
 
     most_popular_tags = Tag.objects.popular_tags()[:5]
