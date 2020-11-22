@@ -6,13 +6,15 @@ from django.contrib.auth.models import User
 
 class PostQuerySet(models.QuerySet):
 
+    def annotate_likes(self):
+        return self.annotate(likes_count=Count('likes'))
+
     def popular_posts(self):
-        popular_posts = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
-        return popular_posts
+        return self.annotate_likes().order_by('-likes_count')
 
     def fresh_posts(self):
-        fresh_posts = self.annotate(comments_count=Count('comments')).order_by('-published_at')
-        return fresh_posts
+        return self.annotate(comments_count=Count('comments'))\
+            .order_by('-published_at')
 
     def fetch_with_comments_count(self):
         posts_ids = [post.id for post in self]
@@ -58,12 +60,11 @@ class Post(models.Model):
 class TagQuerySet(models.QuerySet):
 
     def popular_tags(self):
-        popular_tags = self.annotate(posts_count=Count('posts')).order_by('-posts_count')
-        return popular_tags
+        return self.annotate(posts_count=Count('posts'))\
+            .order_by('-posts_count')
 
     def posts_count(self):
-        posts = self.annotate(posts_count=Count('posts'))
-        return posts
+        return self.annotate(posts_count=Count('posts'))
 
 
 class Tag(models.Model):
